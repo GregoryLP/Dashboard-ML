@@ -56,7 +56,6 @@ selected_option_latitude2 = st.selectbox("Sélectionnez une deuxieme latitude", 
 options2longitude = ["-0.00000", "-1.00000", "-2.00000", "-3.00000", "-4.00000", "-5.00000", "-6.00000", "-7.00000", "-8.00000", "-9.00000"]
 selected_option_longitude2 = st.selectbox("Sélectionnez une deuxieme longitude", options2longitude)
 latitudelongitude2 = selected_option_latitude2 + selected_option_longitude2
-st.write(latitudeLongitude1, latitudelongitude2)
 
 if latitudeLongitude1 and latitudelongitude2:
 
@@ -79,7 +78,7 @@ if latitudeLongitude1 and latitudelongitude2:
     st.bar_chart({'50-60': moyenne_50_60, '60-70': moyenne_60_70, '70-80': moyenne_70_80, '80-90': moyenne_80_90, '90-100': moyenne_90_100, 'Sup à 100': moyenne_sup_100})
 
 
-#histogramme par sélection de deux dates
+#Histogramme par sélection de deux dates
 date_min = datetime.date(2021, 1, 1)
 date_max = datetime.date(2021, 12, 31)
 date1 = st.date_input("Sélectionnez la première date :", date_max, date_min)

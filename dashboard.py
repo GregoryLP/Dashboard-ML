@@ -3,7 +3,10 @@ import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 import datetime
+import zipfile
 
+with zipfile.ZipFile("opendata-vitesse-2021-01-01-2021-12-31.zip", "r") as zip_ref:
+    zip_ref.extractall()
 df_vitesse = pd.read_csv("opendata-vitesse-2021-01-01-2021-12-31.csv", sep=';')
 
 nbrexces = df_vitesse['mesure'] - df_vitesse['limite']

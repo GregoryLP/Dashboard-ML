@@ -165,8 +165,8 @@ kmeans_model = KMeans(n_clusters=1) # 3 clusters
 newData['cluster'] = kmeans_model.fit_predict(X)
 
 chart = alt.Chart(newData).mark_circle().encode(
-    x='limite',
-    y='mesure',
+    x='latitude',
+    y='longitude',
     color='cluster:N'
 ).properties(
     width=600,

@@ -16,3 +16,4 @@ Ou vous pouvez directement avoir accès a ce dashboard depuis cette url : https:
 En terme de développement le dashboard.py sert à lancer l'application et faire le dashboard
 Le requirements permet d'installer les derniers packages
 Le miniprojet.ipynb sert à faire les tests des différents histogrammes ou d'utilisation des données.
+Pour pouvoir changer les données vous pouvez dans les variables X et Y du côté machine learning

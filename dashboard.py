@@ -4,6 +4,11 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import datetime
 import zipfile
+from sklearn.cluster import KMeans
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+import seaborn as sns
+import altair as alt
 
 with zipfile.ZipFile("opendata-vitesse-2021-01-01-2021-12-31.zip", "r") as zip_ref:
     zip_ref.extractall()
@@ -116,3 +121,55 @@ st.write(f"Nombre d'excès de vitesse entre 10 km/h et 20 km/h : {len(mesure_10_
 st.write(f"Nombre d'excès de vitesse entre 20 km/h et 30 km/h : {len(mesure_20_30)}")
 st.write(f"Nombre d'excès de vitesse entre 30 km/h et 40 km/h : {len(mesure_30_40)}")
 st.write(f"Nombre d'excès de vitesse supérieurs à 40 km/h : {len(mesure_supp_40)}")
+
+st.title('Machine Learning')
+# Sélection d'un nombre entre 0 et 500 000 pour éviter d'être au dessus des 200mb
+newData = df_vitesse.iloc[0:500000]
+# Afficher le graphiques avec Altair
+st.subheader('Afficher le graphique avec Altair')
+chart = alt.Chart(newData).mark_circle().encode(
+    alt.X(alt.repeat("column"), type='quantitative'),
+    alt.Y(alt.repeat("row"), type='quantitative'),
+    color='variable:N'
+).properties(
+    width=150,
+    height=150
+).repeat(
+    row=['mesure'],
+    column=['limite']
+).interactive()
+st.altair_chart(chart, use_container_width=True)
+
+st.subheader('Afficher la linear regression et le clustering')
+
+position = newData['position'].str.strip()
+newData['position'].replace('null', pd.NA, inplace=True)
+newData[['latitude', 'longitude']] = position.str.split(expand=True)
+newData['latitude'] = pd.to_numeric(newData['latitude'], errors='coerce')
+newData['longitude'] = pd.to_numeric(newData['longitude'], errors='coerce')
+newData = newData.dropna()
+
+X = newData[['latitude', 'longitude']]
+y = newData['limite']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+linear_reg_model = LinearRegression()
+linear_reg_model.fit(X_train, y_train)
+linear_reg_score = linear_reg_model.score(X_test, y_test)
+st.write(f"Score de la régression linéaire : {linear_reg_score}")
+st.write("Coefficient (pente) :", linear_reg_model.coef_)
+st.write("Intercept :", linear_reg_model.intercept_)
+
+
+kmeans_model = KMeans(n_clusters=1) # 3 clusters
+newData['cluster'] = kmeans_model.fit_predict(X)
+
+chart = alt.Chart(newData).mark_circle().encode(
+    x='limite',
+    y='mesure',
+    color='cluster:N'
+).properties(
+    width=600,
+    height=400
+)
+st.altair_chart(chart, use_container_width=True)

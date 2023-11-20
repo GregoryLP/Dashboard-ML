@@ -126,9 +126,9 @@ st.write(f"Nombre d'excès de vitesse entre 30 km/h et 40 km/h : {len(mesure_30_
 st.write(f"Nombre d'excès de vitesse supérieurs à 40 km/h : {len(mesure_supp_40)}")
 
 st.title('Machine Learning')
-# Sélection d'un nombre entre 0 et 500 000 pour éviter d'être au dessus des 200mb
-newData = df_vitesse.iloc[0:500000]
-# Afficher le graphiques avec Altair
+# Sélection d'un nombre entre 0 et 200 000 pour éviter d'être au dessus des 200mb
+newData = df_vitesse.iloc[0:200000]
+
 st.subheader('Afficher le graphique avec Altair')
 chart = alt.Chart(newData).mark_circle().encode(
     alt.X(alt.repeat("column"), type='quantitative'),
@@ -176,7 +176,6 @@ chart = alt.Chart(newData).mark_circle().encode(
     height=400
 )
 st.altair_chart(chart, use_container_width=True)
-
 
 #Renforcement learning
 

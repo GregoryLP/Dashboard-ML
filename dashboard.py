@@ -9,6 +9,9 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import seaborn as sns
 import altair as alt
+from pdb import set_trace
+import random
+from scipy.stats import beta as beta_dist
 
 with zipfile.ZipFile("opendata-vitesse-2021-01-01-2021-12-31.zip", "r") as zip_ref:
     zip_ref.extractall()
@@ -161,7 +164,7 @@ st.write("Coefficient (pente) :", linear_reg_model.coef_)
 st.write("Intercept :", linear_reg_model.intercept_)
 
 
-kmeans_model = KMeans(n_clusters=1) # 3 clusters
+kmeans_model = KMeans(n_clusters=1) # 1 clusters
 newData['cluster'] = kmeans_model.fit_predict(X)
 
 chart = alt.Chart(newData).mark_circle().encode(
@@ -173,3 +176,48 @@ chart = alt.Chart(newData).mark_circle().encode(
     height=400
 )
 st.altair_chart(chart, use_container_width=True)
+
+
+#Renforcement learning
+
+st.title('Reinforcement Learning - Thompson Sampling')
+
+class ThompsonSamplingAgent:
+    def __init__(self, actions):
+        self.actions = actions
+        self.alpha_beta = {action: (1, 1) for action in actions}
+
+    def get_action(self):
+        samples = {action: beta_dist.rvs(alpha, beta, size=1)[0] for action, (alpha, beta) in self.alpha_beta.items()}
+        return max(samples, key=samples.get)
+
+    def update_parameters(self, action, reward):
+        alpha, beta = self.alpha_beta[action]
+        self.alpha_beta[action] = (alpha + reward, beta + (1 - reward))
+
+actions = [0, 1]
+agent_ts = ThompsonSamplingAgent(actions)
+
+success_rate_history = {action: [] for action in actions}
+
+for epoch in range(50):
+    chosen_action_ts = agent_ts.get_action()
+    reward_ts = len(mesures[actions.index(chosen_action_ts)]) > 0
+    agent_ts.update_parameters(chosen_action_ts, reward_ts)
+    for action, history in success_rate_history.items():
+        history.append(agent_ts.alpha_beta[action][0] / sum(agent_ts.alpha_beta[action]))
+
+epoch_values = list(range(1, 51))  # Remplacez 6 par le nombre total d'époques que vous souhaitez afficher
+success_rate_df = pd.DataFrame({action: history for action, history in success_rate_history.items()})
+success_rate_df['Epoch'] = epoch_values  # Ajoutez la colonne 'Epoch'
+
+chart_ts = alt.Chart(success_rate_df.melt('Epoch')).mark_line().encode(
+    x='Epoch:O',
+    y='value:Q',
+    color='variable:N'
+).properties(
+    width=600,
+    height=400
+)
+
+st.altair_chart(chart_ts, use_container_width=True)

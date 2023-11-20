@@ -207,9 +207,9 @@ for epoch in range(50):
     for action, history in success_rate_history.items():
         history.append(agent_ts.alpha_beta[action][0] / sum(agent_ts.alpha_beta[action]))
 
-epoch_values = list(range(1, 51))  # Remplacez 6 par le nombre total d'époques que vous souhaitez afficher
+epoch_values = list(range(1, 51))
 success_rate_df = pd.DataFrame({action: history for action, history in success_rate_history.items()})
-success_rate_df['Epoch'] = epoch_values  # Ajoutez la colonne 'Epoch'
+success_rate_df['Epoch'] = epoch_values
 
 chart_ts = alt.Chart(success_rate_df.melt('Epoch')).mark_line().encode(
     x='Epoch:O',
